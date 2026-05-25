@@ -4,30 +4,120 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Infinix GT50 Pro – Mechanics</title>
+
+  <!-- Favicon via SVG data URI -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%23050a10'/><text y='46' x='8' font-size='40' font-family='sans-serif' font-weight='900' fill='%2300e5ff'>G</text></svg>" />
+
   <style>
-    *, *::before, *::after {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
       --neon: #00e5ff;
-      --neon-glow: rgba(0, 229, 255, 0.35);
+      --neon-glow: rgba(0,229,255,0.35);
       --green: #39ff14;
       --dark: #050a10;
-      --panel: rgba(8, 18, 30, 0.92);
+      --panel: rgba(8,18,30,0.92);
     }
 
-    html {
-      scroll-behavior: smooth;
-    }
+    html { scroll-behavior: smooth; }
 
     body {
       background-color: var(--dark);
       font-family: 'Segoe UI', sans-serif;
       color: #fff;
       overflow-x: hidden;
+    }
+
+    /* ── Loading Screen ── */
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: var(--dark);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    #loading-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loading-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      animation: loadLogoIn 0.6s ease forwards;
+    }
+
+    @keyframes loadLogoIn {
+      from { opacity: 0; transform: scale(0.85) translateY(10px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .loading-logo img {
+      height: 32px;
+      filter: invert(1);
+    }
+
+    .loading-logo .load-gt {
+      height: 20px;
+      filter: brightness(1.4) contrast(1.2);
+      mix-blend-mode: lighten;
+    }
+
+    .loading-bar-wrap {
+      width: 200px;
+      height: 2px;
+      background: rgba(0,229,255,0.12);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .loading-bar-fill {
+      height: 100%;
+      background: var(--neon);
+      box-shadow: 0 0 10px var(--neon);
+      width: 0%;
+      animation: loadFill 1.4s ease forwards;
+    }
+
+    @keyframes loadFill {
+      0%   { width: 0%; }
+      60%  { width: 70%; }
+      100% { width: 100%; }
+    }
+
+    .loading-tagline {
+      font-size: 0.64rem;
+      letter-spacing: 0.3em;
+      color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      animation: fadeInUp 0.8s 0.3s ease both;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Scroll Progress Bar ── */
+    #scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      width: 0%;
+      background: linear-gradient(to right, var(--neon), #39ff14);
+      box-shadow: 0 0 10px var(--neon);
+      z-index: 200;
+      transition: width 0.1s linear;
     }
 
     /* ── Scanline overlay ── */
@@ -37,69 +127,42 @@
       inset: 0;
       background: repeating-linear-gradient(
         to bottom,
-        transparent 0px,
-        transparent 3px,
-        rgba(0, 0, 0, 0.08) 3px,
-        rgba(0, 0, 0, 0.08) 4px
+        transparent 0px, transparent 3px,
+        rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px
       );
       pointer-events: none;
-      z-index: 999;
+      z-index: 998;
+    }
+
+    /* ── Particle Canvas ── */
+    #particle-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
     }
 
     /* ── Nav bar ── */
     nav {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 0; left: 0; right: 0;
       z-index: 100;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 14px 32px;
-      background: rgb(5, 10, 16);
+      background: rgb(5,10,16);
       backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(0, 229, 255, 0.15);
+      border-bottom: 1px solid rgba(0,229,255,0.15);
     }
 
-    nav .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    nav .brand { display: flex; align-items: center; gap: 10px; }
+    nav .brand img { display: block; }
+    nav .brand .logo-infinix { height: 22px; filter: invert(1); mix-blend-mode: screen; }
+    nav .brand .logo-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.3); flex-shrink: 0; margin: 0 4px; }
+    nav .brand .logo-gt50 { height: 18px; mix-blend-mode: lighten; filter: brightness(1.4) contrast(1.2); }
 
-    nav .brand img {
-      display: block;
-    }
-
-    nav .brand .logo-infinix {
-      height: 22px;
-      width: auto;
-      filter: invert(1);
-      mix-blend-mode: screen;
-    }
-
-    nav .brand .logo-sep {
-      width: 1px;
-      height: 20px;
-      background: rgba(255, 255, 255, 0.3);
-      flex-shrink: 0;
-      margin: 0 4px;
-    }
-
-    nav .brand .logo-gt50 {
-      height: 18px;
-      width: auto;
-      mix-blend-mode: lighten;
-      filter: brightness(1.4) contrast(1.2);
-    }
-
-    nav .links {
-      display: flex;
-      gap: 28px;
-      list-style: none;
-    }
-
+    nav .links { display: flex; gap: 28px; list-style: none; }
     nav .links a {
       text-decoration: none;
       font-size: 0.78rem;
@@ -108,14 +171,92 @@
       color: rgba(255,255,255,0.6);
       transition: color 0.2s;
     }
+    nav .links a:hover { color: var(--neon); }
 
-    nav .links a:hover {
+    /* ── Countdown ── */
+    #countdown-section {
+      text-align: center;
+      padding: 100px 20px 40px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .countdown-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.28em;
+      color: rgba(255,255,255,0.45);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .countdown-grid {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .countdown-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(0,229,255,0.05);
+      border: 1px solid rgba(0,229,255,0.2);
+      border-radius: 12px;
+      padding: 16px 0;
+      width: 80px;
+      box-shadow: 0 0 20px rgba(0,229,255,0.08);
+      flex-shrink: 0;
+    }
+
+    .countdown-num {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
       color: var(--neon);
+      text-shadow: 0 0 20px rgba(0,229,255,0.6), 0 0 40px rgba(0,229,255,0.3);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum";
+      width: 2.5ch;
+      text-align: center;
+      display: inline-block;
     }
 
-    #hero {
-      padding-top: 0;
+    .countdown-unit {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.35);
+      margin-top: 6px;
+      text-transform: uppercase;
     }
+
+    .countdown-colon {
+      font-size: 2rem;
+      font-weight: 800;
+      color: rgba(0,229,255,0.4);
+      margin-bottom: 18px;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.1; }
+    }
+
+    .live-msg {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      color: var(--neon);
+      text-shadow: 0 0 30px rgba(0,229,255,0.8);
+      animation: pulse-glow 1.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse-glow {
+      from { text-shadow: 0 0 20px rgba(0,229,255,0.6); }
+      to   { text-shadow: 0 0 50px rgba(0,229,255,1), 0 0 80px rgba(0,229,255,0.5); }
+    }
+
 
     /* ── Image sections ── */
     .img-section {
@@ -125,6 +266,7 @@
       align-items: center;
       padding: 48px 20px;
       overflow: hidden;
+      z-index: 2;
     }
 
     .img-section::before {
@@ -142,9 +284,9 @@
       border-radius: 18px;
       overflow: hidden;
       box-shadow:
-        0 0 0 1px rgba(0, 229, 255, 0.2),
-        0 0 40px rgba(0, 229, 255, 0.12),
-        0 20px 60px rgba(0, 0, 0, 0.6);
+        0 0 0 1px rgba(0,229,255,0.2),
+        0 0 40px rgba(0,229,255,0.12),
+        0 20px 60px rgba(0,0,0,0.6);
       opacity: 0;
       transform: translateY(40px);
       transition: opacity 0.7s ease, transform 0.7s ease;
@@ -155,38 +297,26 @@
       transform: translateY(0);
     }
 
-    /* Corner accent decorations */
-    .img-wrapper::before,
-    .img-wrapper::after {
+    .img-wrapper::before, .img-wrapper::after {
       content: '';
       position: absolute;
-      width: 28px;
-      height: 28px;
-      z-index: 2;
-      pointer-events: none;
+      width: 28px; height: 28px;
+      z-index: 2; pointer-events: none;
     }
+    .img-wrapper::before { top:0; left:0; border-top:2px solid var(--neon); border-left:2px solid var(--neon); border-radius:18px 0 0 0; }
+    .img-wrapper::after  { bottom:0; right:0; border-bottom:2px solid var(--neon); border-right:2px solid var(--neon); border-radius:0 0 18px 0; }
 
-    .img-wrapper::before {
-      top: 0; left: 0;
-      border-top: 2px solid var(--neon);
-      border-left: 2px solid var(--neon);
-      border-radius: 18px 0 0 0;
-    }
-
-    .img-wrapper::after {
-      bottom: 0; right: 0;
-      border-bottom: 2px solid var(--neon);
-      border-right: 2px solid var(--neon);
-      border-radius: 0 0 18px 0;
-    }
-
+    /* Ken Burns zoom on scroll */
     .img-wrapper img {
       display: block;
       width: 100%;
       height: auto;
+      transform: scale(1);
+      transition: transform 0.1s linear;
+      transform-origin: center center;
     }
 
-    /* Neon line separator between sections */
+    /* ── Divider ── */
     .divider {
       display: flex;
       align-items: center;
@@ -195,34 +325,68 @@
       opacity: 0;
       transform: scaleX(0.6);
       transition: opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s;
+      z-index: 2;
+      position: relative;
+    }
+    .divider.visible { opacity: 1; transform: scaleX(1); }
+    .divider-line { flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--neon), transparent); }
+    .divider-icon { width: 10px; height: 10px; border: 1px solid var(--neon); transform: rotate(45deg); box-shadow: 0 0 8px var(--neon-glow); background: var(--dark); }
+
+    /* ── Share Buttons ── */
+    #share-section {
+      text-align: center;
+      padding: 24px 20px 8px;
+      position: relative;
+      z-index: 2;
     }
 
-    .divider.visible {
-      opacity: 1;
-      transform: scaleX(1);
+    .share-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.24em;
+      color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      margin-bottom: 14px;
     }
 
-    .divider-line {
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(to right, transparent, var(--neon), transparent);
+    .share-btns {
+      display: inline-flex;
+      gap: 12px;
+      align-items: center;
     }
 
-    .divider-icon {
-      width: 10px;
-      height: 10px;
-      border: 1px solid var(--neon);
-      transform: rotate(45deg);
-      box-shadow: 0 0 8px var(--neon-glow);
-      background: var(--dark);
+    .share-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 18px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.6);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, background 0.2s, box-shadow 0.2s;
     }
+
+    .share-btn:hover {
+      border-color: var(--neon);
+      color: var(--neon);
+      background: rgba(0,229,255,0.06);
+      box-shadow: 0 0 14px rgba(0,229,255,0.15);
+    }
+
+    .share-btn svg { flex-shrink: 0; }
 
     /* ── Hashtag strip ── */
     #hashtags {
       text-align: center;
-      padding: 28px 20px 16px;
+      padding: 16px 20px 16px;
+      z-index: 2;
+      position: relative;
     }
-
     #hashtags p {
       font-size: 0.72rem;
       letter-spacing: 0.18em;
@@ -230,11 +394,7 @@
       text-transform: uppercase;
       line-height: 2.2;
     }
-
-    #hashtags p span {
-      color: var(--neon);
-      opacity: 0.7;
-    }
+    #hashtags p span { color: var(--neon); opacity: 0.7; }
 
     /* ── Footer ── */
     footer {
@@ -245,120 +405,51 @@
       color: rgba(255,255,255,0.2);
       text-transform: uppercase;
       border-top: 1px solid rgba(255,255,255,0.06);
-    }
-
-    footer a {
-      color: var(--neon);
-      opacity: 0.6;
-      text-decoration: none;
-    }
-
-    /* Ambient glow blobs */
-    .glow-blob {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .glow-blob-1 {
-      width: 400px; height: 400px;
-      background: rgba(0, 229, 255, 0.05);
-      top: -100px; left: -100px;
-    }
-
-    .glow-blob-2 {
-      width: 500px; height: 500px;
-      background: rgba(57, 255, 20, 0.03);
-      bottom: -150px; right: -150px;
-    }
-
-    /* ── Countdown ── */
-    #countdown-section {
-      text-align: center;
-      padding: 100px 20px 40px; /* top accounts for fixed nav */
       position: relative;
+      z-index: 2;
     }
+    footer a { color: var(--neon); opacity: 0.6; text-decoration: none; }
 
-    .countdown-label {
-      font-size: 0.72rem;
-      letter-spacing: 0.28em;
-      color: rgba(255, 255, 255, 0.45);
-      text-transform: uppercase;
-      margin-bottom: 20px;
-    }
-
-    .countdown-grid {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .countdown-block {
+    /* ── Back to Top ── */
+    #back-top {
+      position: fixed;
+      bottom: 32px;
+      right: 28px;
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: rgba(0,229,255,0.1);
+      border: 1px solid rgba(0,229,255,0.3);
+      color: var(--neon);
       display: flex;
-      flex-direction: column;
       align-items: center;
-      background: rgba(0, 229, 255, 0.05);
-      border: 1px solid rgba(0, 229, 255, 0.2);
-      border-radius: 12px;
-      padding: 16px 0;
-      width: 80px;
-      box-shadow: 0 0 20px rgba(0, 229, 255, 0.08);
-      flex-shrink: 0;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 150;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.3s, transform 0.3s, background 0.2s, box-shadow 0.2s;
+      pointer-events: none;
     }
 
-    .countdown-num {
-      font-size: 2.8rem;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      color: var(--neon);
-      text-shadow: 0 0 20px rgba(0, 229, 255, 0.6), 0 0 40px rgba(0, 229, 255, 0.3);
-      line-height: 1;
-      font-variant-numeric: tabular-nums;
-      font-feature-settings: "tnum";
-      width: 2.5ch;
-      text-align: center;
-      display: inline-block;
+    #back-top.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
     }
 
-    .countdown-unit {
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      color: rgba(255, 255, 255, 0.35);
-      margin-top: 6px;
-      text-transform: uppercase;
+    #back-top:hover {
+      background: rgba(0,229,255,0.2);
+      box-shadow: 0 0 20px rgba(0,229,255,0.3);
     }
 
-    .countdown-colon {
-      font-size: 2rem;
-      font-weight: 800;
-      color: rgba(0, 229, 255, 0.4);
-      margin-bottom: 18px;
-      animation: blink 1s step-end infinite;
-    }
+    /* Ambient blobs */
+    .glow-blob { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
+    .glow-blob-1 { width:400px; height:400px; background:rgba(0,229,255,0.05); top:-100px; left:-100px; }
+    .glow-blob-2 { width:500px; height:500px; background:rgba(57,255,20,0.03); bottom:-150px; right:-150px; }
 
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.1; }
-    }
-
-    .live-msg {
-      font-size: 1.4rem;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      color: var(--neon);
-      text-shadow: 0 0 30px rgba(0, 229, 255, 0.8);
-      animation: pulse-glow 1.5s ease-in-out infinite alternate;
-    }
-
-    @keyframes pulse-glow {
-      from { text-shadow: 0 0 20px rgba(0, 229, 255, 0.6); }
-      to   { text-shadow: 0 0 50px rgba(0, 229, 255, 1), 0 0 80px rgba(0, 229, 255, 0.5); }
-    }
-
+    /* ── Responsive ── */
     @media (max-width: 600px) {
-      /* Nav */
       nav { padding: 10px 16px; }
       nav .brand .logo-infinix { height: 18px; }
       nav .brand .logo-gt50 { height: 14px; }
@@ -366,28 +457,25 @@
       nav .links { gap: 14px; }
       nav .links a { font-size: 0.68rem; letter-spacing: 0.08em; }
 
-      /* Countdown */
-      #countdown-section { padding: 80px 12px 28px; }
+      #countdown-section { padding: 80px 12px 20px; }
       .countdown-label { font-size: 0.62rem; letter-spacing: 0.18em; margin-bottom: 14px; }
-      .countdown-block { min-width: 0; width: 68px; padding: 10px 0; border-radius: 10px; }
+      .countdown-block { width: 68px; padding: 10px 0; border-radius: 10px; }
       .countdown-num { font-size: 2rem; }
       .countdown-unit { font-size: 0.5rem; letter-spacing: 0.12em; margin-top: 4px; }
       .countdown-colon { font-size: 1.4rem; margin-bottom: 14px; }
       .countdown-grid { gap: 5px; }
       .live-msg { font-size: 1rem; letter-spacing: 0.08em; padding: 0 12px; }
 
-      /* Images */
       .img-section { padding: 16px 10px; }
       .img-wrapper { border-radius: 12px; }
-
-      /* Hashtags */
       #hashtags p { font-size: 0.6rem; letter-spacing: 0.1em; line-height: 2; }
-
-      /* Footer */
       footer { font-size: 0.6rem; padding: 18px 12px 28px; }
+
+      .share-btns { gap: 8px; }
+      .share-btn { padding: 8px 12px; font-size: 0.62rem; }
+      #back-top { bottom: 20px; right: 16px; }
     }
 
-    /* Extra small screens (iPhone SE etc) */
     @media (max-width: 380px) {
       .countdown-block { width: 58px; padding: 8px 0; }
       .countdown-num { font-size: 1.7rem; }
@@ -398,34 +486,44 @@
 </head>
 <body>
 
-  <!-- Ambient background blobs -->
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="loading-logo">
+      <img src="https://raw.githubusercontent.com/InfinixPH/GT50-PRO/main/infinix.png" alt="Infinix" />
+      <img src="https://raw.githubusercontent.com/InfinixPH/GT50-PRO/main/gt50%20pro.png" alt="GT50 Pro" class="load-gt" />
+    </div>
+    <div class="loading-bar-wrap">
+      <div class="loading-bar-fill"></div>
+    </div>
+    <div class="loading-tagline">Unleash the Liquid Cooling Beast</div>
+  </div>
+
+  <!-- Scroll Progress -->
+  <div id="scroll-progress"></div>
+
+  <!-- Particle Canvas -->
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- Ambient blobs -->
   <div class="glow-blob glow-blob-1"></div>
   <div class="glow-blob glow-blob-2"></div>
 
   <!-- Nav -->
   <nav>
     <div class="brand">
-      <img
-        src="https://raw.githubusercontent.com/InfinixPH/GT50-PRO/main/infinix.png"
-        alt="Infinix"
-        class="logo-infinix"
-      />
+      <img src="https://raw.githubusercontent.com/InfinixPH/GT50-PRO/main/infinix.png" alt="Infinix" class="logo-infinix" />
       <div class="logo-sep"></div>
-      <img
-        src="https://raw.githubusercontent.com/InfinixPH/GT50-PRO/main/gt50%20pro.png"
-        alt="GT50 Pro"
-        class="logo-gt50"
-      />
+      <img src="https://raw.githubusercontent.com/InfinixPH/GT50-PRO/main/gt50%20pro.png" alt="GT50 Pro" class="logo-gt50" />
     </div>
     <ul class="links">
-      <li><a href="#hero">Pre-order</a></li>
+      <li><a href="#countdown-section">Pre-order</a></li>
       <li><a href="#mechanics">Mechanics</a></li>
     </ul>
   </nav>
 
   <!-- Countdown Timer -->
   <section id="countdown-section">
-    <p class="countdown-label">PRE-ORDER STARTS IN</p>
+    <p class="countdown-label" id="countdown-label-text">PRE-ORDER STARTS IN</p>
     <div id="countdown-live" class="countdown-grid">
       <div class="countdown-block">
         <span class="countdown-num" id="cd-days">00</span>
@@ -450,15 +548,18 @@
     <div id="countdown-live-msg" class="live-msg" style="display:none;">
       🎮 PRE-ORDER IS NOW LIVE!
     </div>
+
+
   </section>
 
-  <!-- Hero / Top image (down.png = promo poster) -->
+  <!-- Hero image -->
   <section id="hero" class="img-section">
     <div class="img-wrapper" id="img-top">
       <img
         src="https://raw.githubusercontent.com/InfinixPH/GT50-PRO/main/down.png"
         alt="Infinix GT50 Pro – Unleash the Liquid Cooling Beast"
         loading="eager"
+        id="ken-img-1"
       />
     </div>
   </section>
@@ -470,16 +571,39 @@
     <div class="divider-line"></div>
   </div>
 
-  <!-- Mechanics image (top.png) -->
+  <!-- Mechanics image -->
   <section id="mechanics" class="img-section">
     <div class="img-wrapper" id="img-bottom">
       <img
         src="https://raw.githubusercontent.com/InfinixPH/GT50-PRO/main/top.png"
         alt="Infinix GT50 Pro – Pre-order Mechanics"
         loading="lazy"
+        id="ken-img-2"
       />
     </div>
   </section>
+
+  <!-- Share Buttons -->
+  <div id="share-section">
+    <p class="share-label">Share the Hype</p>
+    <div class="share-btns">
+
+      <!-- X / Twitter -->
+      <a
+        href="https://twitter.com/intent/tweet?text=%23InfinixGT50Pro%20%23UnleashTheLiquidCoolingBeast%20%23MPLOfficialGamingPhone"
+        target="_blank" rel="noopener" class="share-btn" title="Share on X">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        X / Twitter
+      </a>
+
+      <!-- Instagram (copy hashtags) -->
+      <button class="share-btn" id="ig-copy-btn" title="Copy hashtags for Instagram">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        <span id="ig-btn-text">Instagram</span>
+      </button>
+
+    </div>
+  </div>
 
   <!-- Hashtag strip -->
   <div id="hashtags">
@@ -493,54 +617,205 @@
   <!-- Footer -->
   <footer>
     &copy; 2026 Infinix Mobile &nbsp;·&nbsp;
-    <a href="https://github.com/InfinixPH/GT50-PRO" target="_blank" rel="noopener">
-      GitHub
-    </a>
+    <a href="https://github.com/InfinixPH/GT50-PRO" target="_blank" rel="noopener">GitHub</a>
     &nbsp;·&nbsp; T&amp;C Apply
   </footer>
 
-  <script>
-    // Intersection Observer for fade-in animations
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
-      });
-    }, { threshold: 0.1 });
+  <!-- Back to Top -->
+  <button id="back-top" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
 
-    document.querySelectorAll('.img-wrapper, .divider').forEach(el => {
-      observer.observe(el);
+  <script>
+    // ── Loading Screen ──
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('loading-screen').classList.add('hidden');
+      }, 1600);
     });
 
-    // Countdown to May 29, 2026 00:00:00 Philippine Time (UTC+8)
-    const targetPHT = new Date('2026-05-29T00:00:00+08:00').getTime();
+    // ── Particle System ──
+    (function() {
+      const canvas = document.getElementById('particle-canvas');
+      const ctx = canvas.getContext('2d');
+      let W, H, particles = [];
+
+      function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      const COLORS = ['rgba(0,229,255,', 'rgba(57,255,20,', 'rgba(0,200,255,'];
+
+      function rand(a, b) { return a + Math.random() * (b - a); }
+
+      // Spark type
+      function Spark() {
+        this.reset = function() {
+          this.x = rand(0, W);
+          this.y = rand(0, H);
+          this.r = rand(0.6, 2.2);
+          this.vx = rand(-0.25, 0.25);
+          this.vy = rand(-0.6, -0.1);
+          this.alpha = rand(0.2, 0.7);
+          this.decay = rand(0.003, 0.007);
+          this.color = COLORS[Math.floor(rand(0, COLORS.length))];
+          this.type = Math.random() > 0.7 ? 'line' : 'dot';
+          this.len = rand(4, 18);
+        };
+        this.reset();
+        this.y = rand(0, H); // distribute on start
+      }
+
+      Spark.prototype.update = function() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= this.decay;
+        if (this.alpha <= 0) this.reset();
+      };
+
+      Spark.prototype.draw = function() {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        if (this.type === 'line') {
+          ctx.beginPath();
+          ctx.moveTo(this.x, this.y);
+          ctx.lineTo(this.x + this.vx * this.len * 4, this.y + this.vy * this.len * 4);
+          ctx.strokeStyle = this.color + this.alpha + ')';
+          ctx.lineWidth = this.r * 0.6;
+          ctx.stroke();
+        } else {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+          ctx.fillStyle = this.color + this.alpha + ')';
+          ctx.fill();
+          // glow
+          ctx.shadowColor = this.color + '0.8)';
+          ctx.shadowBlur = 8;
+          ctx.fill();
+        }
+        ctx.restore();
+      };
+
+      const COUNT = 120;
+      for (let i = 0; i < COUNT; i++) particles.push(new Spark());
+
+      function loop() {
+        ctx.clearRect(0, 0, W, H);
+        for (const p of particles) { p.update(); p.draw(); }
+        requestAnimationFrame(loop);
+      }
+      loop();
+    })();
+
+    // ── Intersection Observer for fade-in ──
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.img-wrapper, .divider').forEach(el => observer.observe(el));
+
+    // ── Countdown Logic ──
+    // Phase 1: Pre-order starts May 29 00:00 PHT
+    // Phase 2: Claiming period Jun 11–15; countdown to Jun 11 00:00 PHT after pre-order live
+    const preorderTarget  = new Date('2026-05-29T00:00:00+08:00').getTime();
+    const claimingTarget  = new Date('2026-06-11T00:00:00+08:00').getTime();
+    const claimingEndDate = new Date('2026-06-15T23:59:59+08:00').getTime();
+
+    const labelEl = document.getElementById('countdown-label-text');
 
     function pad(n) { return String(n).padStart(2, '0'); }
 
-    function updateCountdown() {
-      const now = Date.now();
-      const diff = targetPHT - now;
-
-      if (diff <= 0) {
-        document.getElementById('countdown-live').style.display = 'none';
-        document.getElementById('countdown-live-msg').style.display = 'block';
-        return;
-      }
-
-      const days  = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const mins  = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const secs  = Math.floor((diff % (1000 * 60)) / 1000);
-
+    function setCountdown(ms) {
+      const days  = Math.floor(ms / 86400000);
+      const hours = Math.floor((ms % 86400000) / 3600000);
+      const mins  = Math.floor((ms % 3600000)  / 60000);
+      const secs  = Math.floor((ms % 60000)    / 1000);
       document.getElementById('cd-days').textContent  = pad(days);
       document.getElementById('cd-hours').textContent = pad(hours);
       document.getElementById('cd-mins').textContent  = pad(mins);
       document.getElementById('cd-secs').textContent  = pad(secs);
     }
 
+    function updateCountdown() {
+      const now = Date.now();
+
+      if (now < preorderTarget) {
+        // Phase 1: counting to pre-order
+        labelEl.textContent = 'PRE-ORDER STARTS IN';
+        document.getElementById('countdown-live').style.display = 'inline-flex';
+        document.getElementById('countdown-live-msg').style.display = 'none';
+        setCountdown(preorderTarget - now);
+
+      } else if (now < claimingTarget) {
+        // Phase 2: pre-order live, counting to claiming
+        document.getElementById('countdown-live').style.display = 'inline-flex';
+        document.getElementById('countdown-live-msg').style.display = 'block';
+        labelEl.textContent = 'CLAIMING PERIOD STARTS IN';
+        setCountdown(claimingTarget - now);
+
+      } else if (now <= claimingEndDate) {
+        // Phase 3: claiming period active
+        labelEl.textContent = 'CLAIMING PERIOD ENDS IN';
+        document.getElementById('countdown-live').style.display = 'inline-flex';
+        document.getElementById('countdown-live-msg').style.display = 'none';
+        setCountdown(claimingEndDate - now);
+
+      } else {
+        // All done
+        document.getElementById('countdown-live').style.display = 'none';
+        document.getElementById('countdown-live-msg').style.display = 'block';
+        document.getElementById('countdown-live-msg').textContent = '🎉 CLAIMING PERIOD HAS ENDED';
+        labelEl.textContent = '';
+      }
+    }
+
     updateCountdown();
     setInterval(updateCountdown, 1000);
+
+    // ── Scroll Progress Bar ──
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      document.getElementById('scroll-progress').style.width = (scrolled / max * 100) + '%';
+    });
+
+    // ── Back to Top ──
+    const backTop = document.getElementById('back-top');
+    window.addEventListener('scroll', () => {
+      backTop.classList.toggle('show', window.scrollY > 300);
+    });
+
+    // ── Ken Burns scroll zoom ──
+    const kenImgs = [
+      { img: document.getElementById('ken-img-1'), wrap: document.getElementById('img-top') },
+      { img: document.getElementById('ken-img-2'), wrap: document.getElementById('img-bottom') },
+    ];
+
+    window.addEventListener('scroll', () => {
+      const sy = window.scrollY;
+      kenImgs.forEach(({ img, wrap }) => {
+        const rect = wrap.getBoundingClientRect();
+        const center = rect.top + rect.height / 2;
+        const vCenter = window.innerHeight / 2;
+        const dist = Math.abs(center - vCenter);
+        const maxDist = window.innerHeight / 2 + rect.height / 2;
+        const progress = Math.max(0, 1 - dist / maxDist);
+        const scale = 1 + progress * 0.045;
+        img.style.transform = `scale(${scale})`;
+      });
+    });
+
+    // ── Instagram Copy Hashtags ──
+    const hashtags = '#InfinixGT50Pro #UnleashTheLiquidCoolingBeast #MPLOfficialGamingPhone';
+    document.getElementById('ig-copy-btn').addEventListener('click', () => {
+      navigator.clipboard.writeText(hashtags).then(() => {
+        const btn = document.getElementById('ig-btn-text');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Instagram', 2000);
+      });
+    });
   </script>
 </body>
 </html>
