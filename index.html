@@ -332,54 +332,6 @@
     .divider-line { flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--neon), transparent); }
     .divider-icon { width: 10px; height: 10px; border: 1px solid var(--neon); transform: rotate(45deg); box-shadow: 0 0 8px var(--neon-glow); background: var(--dark); }
 
-    /* ── Share Buttons ── */
-    #share-section {
-      text-align: center;
-      padding: 24px 20px 8px;
-      position: relative;
-      z-index: 2;
-    }
-
-    .share-label {
-      font-size: 0.62rem;
-      letter-spacing: 0.24em;
-      color: rgba(255,255,255,0.3);
-      text-transform: uppercase;
-      margin-bottom: 14px;
-    }
-
-    .share-btns {
-      display: inline-flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .share-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 9px 18px;
-      border-radius: 6px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.04);
-      color: rgba(255,255,255,0.6);
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      text-decoration: none;
-      cursor: pointer;
-      transition: border-color 0.2s, color 0.2s, background 0.2s, box-shadow 0.2s;
-    }
-
-    .share-btn:hover {
-      border-color: var(--neon);
-      color: var(--neon);
-      background: rgba(0,229,255,0.06);
-      box-shadow: 0 0 14px rgba(0,229,255,0.15);
-    }
-
-    .share-btn svg { flex-shrink: 0; }
-
     /* ── Hashtag strip ── */
     #hashtags {
       text-align: center;
@@ -583,27 +535,7 @@
     </div>
   </section>
 
-  <!-- Share Buttons -->
-  <div id="share-section">
-    <p class="share-label">Share the Hype</p>
-    <div class="share-btns">
 
-      <!-- X / Twitter -->
-      <a
-        href="https://twitter.com/intent/tweet?text=%23InfinixGT50Pro%20%23UnleashTheLiquidCoolingBeast%20%23MPLOfficialGamingPhone"
-        target="_blank" rel="noopener" class="share-btn" title="Share on X">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-        X / Twitter
-      </a>
-
-      <!-- Instagram (copy hashtags) -->
-      <button class="share-btn" id="ig-copy-btn" title="Copy hashtags for Instagram">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-        <span id="ig-btn-text">Instagram</span>
-      </button>
-
-    </div>
-  </div>
 
   <!-- Hashtag strip -->
   <div id="hashtags">
@@ -807,15 +739,7 @@
       });
     });
 
-    // ── Instagram Copy Hashtags ──
-    const hashtags = '#InfinixGT50Pro #UnleashTheLiquidCoolingBeast #MPLOfficialGamingPhone';
-    document.getElementById('ig-copy-btn').addEventListener('click', () => {
-      navigator.clipboard.writeText(hashtags).then(() => {
-        const btn = document.getElementById('ig-btn-text');
-        btn.textContent = 'Copied!';
-        setTimeout(() => btn.textContent = 'Instagram', 2000);
-      });
-    });
+
   </script>
 </body>
 </html>
