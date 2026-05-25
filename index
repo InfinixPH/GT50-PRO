@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Infinix GT50 Pro – Mechanics</title>
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --neon: #00e5ff;
+      --neon-glow: rgba(0, 229, 255, 0.35);
+      --green: #39ff14;
+      --dark: #050a10;
+      --panel: rgba(8, 18, 30, 0.92);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--dark);
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* ── Scanline overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        rgba(0, 0, 0, 0.08) 3px,
+        rgba(0, 0, 0, 0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* ── Nav bar ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 32px;
+      background: rgba(5, 10, 16, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0, 229, 255, 0.15);
+    }
+
+    nav .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    nav .brand img {
+      display: block;
+      mix-blend-mode: screen; /* makes black bg transparent on dark nav */
+    }
+
+    nav .brand .logo-infinix {
+      height: 22px;
+      width: auto;
+      filter: brightness(0) invert(1); /* force white */
+    }
+
+    nav .brand .logo-sep {
+      width: 1px;
+      height: 18px;
+      background: rgba(0, 229, 255, 0.4);
+      flex-shrink: 0;
+    }
+
+    nav .brand .logo-gt50 {
+      height: 18px;
+      width: auto;
+      filter: brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(160deg); /* white → neon cyan tint */
+      opacity: 0.95;
+    }
+
+    nav .links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+
+    nav .links a {
+      text-decoration: none;
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      transition: color 0.2s;
+    }
+
+    nav .links a:hover {
+      color: var(--neon);
+    }
+
+    /* ── Hero section ── */
+    #hero {
+      padding-top: 72px; /* offset for nav */
+    }
+
+    /* ── Image sections ── */
+    .img-section {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 48px 20px;
+      overflow: hidden;
+    }
+
+    .img-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(0,229,255,0.04) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .img-wrapper {
+      position: relative;
+      max-width: 780px;
+      width: 100%;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(0, 229, 255, 0.2),
+        0 0 40px rgba(0, 229, 255, 0.12),
+        0 20px 60px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .img-wrapper.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Corner accent decorations */
+    .img-wrapper::before,
+    .img-wrapper::after {
+      content: '';
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .img-wrapper::before {
+      top: 0; left: 0;
+      border-top: 2px solid var(--neon);
+      border-left: 2px solid var(--neon);
+      border-radius: 18px 0 0 0;
+    }
+
+    .img-wrapper::after {
+      bottom: 0; right: 0;
+      border-bottom: 2px solid var(--neon);
+      border-right: 2px solid var(--neon);
+      border-radius: 0 0 18px 0;
+    }
+
+    .img-wrapper img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    /* Neon line separator between sections */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 40px;
+      opacity: 0;
+      transform: scaleX(0.6);
+      transition: opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s;
+    }
+
+    .divider.visible {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--neon), transparent);
+    }
+
+    .divider-icon {
+      width: 10px;
+      height: 10px;
+      border: 1px solid var(--neon);
+      transform: rotate(45deg);
+      box-shadow: 0 0 8px var(--neon-glow);
+      background: var(--dark);
+    }
+
+    /* ── Hashtag strip ── */
+    #hashtags {
+      text-align: center;
+      padding: 28px 20px 16px;
+    }
+
+    #hashtags p {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+    }
+
+    #hashtags p span {
+      color: var(--neon);
+      opacity: 0.7;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 24px 20px 36px;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.2);
+      text-transform: uppercase;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    footer a {
+      color: var(--neon);
+      opacity: 0.6;
+      text-decoration: none;
+    }
+
+    /* Ambient glow blobs */
+    .glow-blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow-blob-1 {
+      width: 400px; height: 400px;
+      background: rgba(0, 229, 255, 0.05);
+      top: -100px; left: -100px;
+    }
+
+    .glow-blob-2 {
+      width: 500px; height: 500px;
+      background: rgba(57, 255, 20, 0.03);
+      bottom: -150px; right: -150px;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      nav { padding: 12px 18px; }
+      nav .links { gap: 16px; }
+      .img-section { padding: 28px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient background blobs -->
+  <div class="glow-blob glow-blob-1"></div>
+  <div class="glow-blob glow-blob-2"></div>
+
+  <!-- Nav -->
+  <nav>
+    <div class="brand">
+      <img
+        src="https://raw.githubusercontent.com/InfinixPH/GT50-PRO/main/infinix.png"
+        alt="Infinix"
+        class="logo-infinix"
+      />
+      <div class="logo-sep"></div>
+      <img
+        src="https://raw.githubusercontent.com/InfinixPH/GT50-PRO/main/gt50_pro.png"
+        alt="GT50 Pro"
+        class="logo-gt50"
+      />
+    </div>
+    <ul class="links">
+      <li><a href="#hero">Pre-order</a></li>
+      <li><a href="#mechanics">Mechanics</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero / Top image (down.png = promo poster) -->
+  <section id="hero" class="img-section">
+    <div class="img-wrapper" id="img-top">
+      <img
+        src="https://raw.githubusercontent.com/InfinixPH/GT50-PRO/main/down.png"
+        alt="Infinix GT50 Pro – Unleash the Liquid Cooling Beast"
+        loading="eager"
+      />
+    </div>
+  </section>
+
+  <!-- Divider -->
+  <div class="divider" id="divider-1">
+    <div class="divider-line"></div>
+    <div class="divider-icon"></div>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- Mechanics image (top.png) -->
+  <section id="mechanics" class="img-section">
+    <div class="img-wrapper" id="img-bottom">
+      <img
+        src="https://raw.githubusercontent.com/InfinixPH/GT50-PRO/main/top.png"
+        alt="Infinix GT50 Pro – Pre-order Mechanics"
+        loading="lazy"
+      />
+    </div>
+  </section>
+
+  <!-- Hashtag strip -->
+  <div id="hashtags">
+    <p>
+      <span>#InfinixGT50Pro</span> &nbsp;|&nbsp;
+      <span>#UnleashTheLiquidCoolingBeast</span> &nbsp;|&nbsp;
+      <span>#MPLOfficialGamingPhone</span>
+    </p>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2026 Infinix Mobile &nbsp;·&nbsp;
+    <a href="https://github.com/InfinixPH/GT50-PRO" target="_blank" rel="noopener">
+      GitHub
+    </a>
+    &nbsp;·&nbsp; T&amp;C Apply
+  </footer>
+
+  <script>
+    // Intersection Observer for fade-in animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.img-wrapper, .divider').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>
