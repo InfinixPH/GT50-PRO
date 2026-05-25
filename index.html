@@ -127,7 +127,7 @@
       z-index: 901;
     }
 
-    /* Canvas */
+    /* Canvas — particles + HydroFlow combined */
     #canvas {
       position: fixed; inset: 0;
       pointer-events: none;
@@ -319,24 +319,40 @@
       position: absolute;
       bottom: 32px; left: 50%; transform: translateX(-50%);
       display: flex; flex-direction: column;
-      align-items: center; gap: 8px;
-      opacity: 0.4;
-      animation: scrollHintFade 2s ease-in-out infinite;
+      align-items: center; gap: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      padding: 8px 16px;
+      animation: scrollBounce 2s ease-in-out infinite;
     }
-    @keyframes scrollHintFade {
-      0%, 100% { opacity: 0.3; transform: translateX(-50%) translateY(0); }
-      50% { opacity: 0.6; transform: translateX(-50%) translateY(6px); }
+    @keyframes scrollBounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(9px); }
     }
     .scroll-hint span {
       font-family: 'Rajdhani', sans-serif;
-      font-size: 0.55rem; letter-spacing: 0.3em;
-      color: rgba(255,255,255,0.4); text-transform: uppercase;
+      font-size: 0.62rem; letter-spacing: 0.3em;
+      color: rgba(0,229,255,0.5); text-transform: uppercase;
+      font-weight: 600;
     }
-    .scroll-arrow {
-      width: 20px; height: 20px;
-      border-right: 1px solid rgba(255,255,255,0.3);
-      border-bottom: 1px solid rgba(255,255,255,0.3);
+    .scroll-arrows {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+    }
+    .scroll-arr {
+      width: 12px; height: 12px;
+      border-right: 2px solid rgba(0,229,255,0.7);
+      border-bottom: 2px solid rgba(0,229,255,0.7);
       transform: rotate(45deg);
+      opacity: 0;
+      animation: arrFade 1.6s ease-in-out infinite;
+    }
+    .scroll-arr:nth-child(1) { animation-delay: 0s; }
+    .scroll-arr:nth-child(2) { animation-delay: 0.25s; }
+    .scroll-arr:nth-child(3) { animation-delay: 0.5s; }
+    @keyframes arrFade {
+      0%   { opacity: 0; }
+      40%  { opacity: 1; }
+      100% { opacity: 0; }
     }
 
     /* IMAGE SECTIONS */
@@ -550,18 +566,68 @@
     /* MOBILE */
     @media (max-width: 640px) {
       nav { padding: 10px 16px; }
-      nav ul { gap: 16px; }
-      #hero-section { padding: 100px 14px 50px; }
-      .cd-block { padding: 18px 16px; }
-      .cd-num { font-size: 2.2rem; }
-      .img-section { padding: 32px 12px; }
-      .divider { padding: 0 20px; }
-      .specs-bar { flex-wrap: wrap; width: calc(100% - 24px); }
-      .spec-item { flex: 0 0 50%; }
+      nav ul { gap: 14px; }
+      nav ul a { font-size: 0.72rem; letter-spacing: 0.1em; }
+      .nav-brand .ni { height: 18px; }
+      .nav-brand .ng { height: 13px; }
+
+      #hero-section { padding: 90px 16px 100px; gap: 16px; }
+
+      .section-eyebrow { font-size: 0.6rem; letter-spacing: 0.25em; margin-bottom: 16px; }
+      .section-eyebrow::before, .section-eyebrow::after { flex: 0 0 24px; }
+
+      #cd-label { font-size: 0.6rem; letter-spacing: 0.2em; }
+
+      .countdown-grid { border-radius: 12px; }
+      .cd-block { padding: 16px 14px; }
+      .cd-num { font-size: 2.4rem; width: 2.2ch; }
+      .cd-unit { font-size: 0.5rem; letter-spacing: 0.18em; margin-top: 4px; }
+      .cd-colon { font-size: 1.6rem; }
+      .cd-colon-wrap { padding-bottom: 16px; }
+
+      .live-badge { font-size: 0.85rem; padding: 8px 18px; letter-spacing: 0.1em; }
+
+      .scroll-hint { bottom: 18px; }
+      .scroll-hint span { font-size: 0.6rem; }
+
+      .img-section { padding: 24px 12px; }
+      .section-label { font-size: 0.58rem; letter-spacing: 0.3em; margin-bottom: 16px; }
+      .img-frame { border-radius: 14px; }
+      .corner { width: 22px; height: 22px; }
+      .corner-tl, .corner-tr { top: 8px; }
+      .corner-bl, .corner-br { bottom: 8px; }
+      .corner-tl, .corner-bl { left: 8px; }
+      .corner-tr, .corner-br { right: 8px; }
+
+      .specs-bar {
+        flex-wrap: wrap;
+        width: calc(100% - 24px);
+        border-radius: 10px;
+      }
+      .spec-item { flex: 0 0 50%; padding: 16px 8px; }
       .spec-item:nth-child(3) { border-left: none; border-top: 1px solid var(--border); }
       .spec-item:nth-child(4) { border-top: 1px solid var(--border); }
+      .spec-val { font-size: 1.3rem; }
+      .spec-label { font-size: 0.5rem; }
+
+      .divider { padding: 0 16px; }
+
+      #hashtags { padding: 20px 12px; }
+      .ht-tag { font-size: 0.62rem; padding: 5px 12px; letter-spacing: 0.1em; }
+
+      footer { font-size: 0.6rem; padding: 16px 12px 32px; }
+
+      #btt { bottom: 20px; right: 14px; width: 40px; height: 40px; }
+
       body { cursor: auto; }
       #cursor, #cursor-ring { display: none; }
+    }
+
+    @media (max-width: 380px) {
+      .cd-block { padding: 12px 10px; }
+      .cd-num { font-size: 1.9rem; }
+      .cd-colon { font-size: 1.3rem; }
+      .ht-tag { font-size: 0.58rem; padding: 4px 10px; }
     }
   </style>
 </head>
@@ -630,10 +696,14 @@
     Pre-order is now live
   </div>
 
-  <div class="scroll-hint">
+  <a class="scroll-hint" href="#" onclick="document.querySelector('.img-section').scrollIntoView({behavior:'smooth'}); return false;" aria-label="Scroll down">
     <span>Scroll</span>
-    <div class="scroll-arrow"></div>
-  </div>
+    <div class="scroll-arrows">
+      <div class="scroll-arr"></div>
+      <div class="scroll-arr"></div>
+      <div class="scroll-arr"></div>
+    </div>
+  </a>
 </section>
 
 <!-- Hero Image -->
@@ -653,11 +723,11 @@
 <!-- Specs Bar -->
 <div class="specs-bar" id="specs-bar">
   <div class="spec-item">
-    <span class="spec-val">6000<sup>mAh</sup></span>
+    <span class="spec-val">6500<sup>mAh</sup></span>
     <span class="spec-label">Battery</span>
   </div>
   <div class="spec-item">
-    <span class="spec-val">90<sup>W</sup></span>
+    <span class="spec-val">45<sup>W</sup></span>
     <span class="spec-label">Fast Charge</span>
   </div>
   <div class="spec-item">
@@ -665,8 +735,8 @@
     <span class="spec-label">AMOLED Display</span>
   </div>
   <div class="spec-item">
-    <span class="spec-val">8350</span>
-    <span class="spec-label">Dimensity Chip</span>
+    <span class="spec-val">8400</span>
+    <span class="spec-label">Dimensity Ultimate</span>
   </div>
 </div>
 
