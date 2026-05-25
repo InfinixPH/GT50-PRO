@@ -113,9 +113,8 @@
       color: var(--neon);
     }
 
-    /* ── Hero section ── */
     #hero {
-      padding-top: 72px; /* offset for nav */
+      padding-top: 0;
     }
 
     /* ── Image sections ── */
@@ -274,6 +273,90 @@
       bottom: -150px; right: -150px;
     }
 
+    /* ── Countdown ── */
+    #countdown-section {
+      text-align: center;
+      padding: 100px 20px 40px; /* top accounts for fixed nav */
+      position: relative;
+    }
+
+    .countdown-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.28em;
+      color: rgba(255, 255, 255, 0.45);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .countdown-grid {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .countdown-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(0, 229, 255, 0.05);
+      border: 1px solid rgba(0, 229, 255, 0.2);
+      border-radius: 12px;
+      padding: 16px 22px;
+      min-width: 80px;
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.08);
+    }
+
+    .countdown-num {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: var(--neon);
+      text-shadow: 0 0 20px rgba(0, 229, 255, 0.6), 0 0 40px rgba(0, 229, 255, 0.3);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .countdown-unit {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: rgba(255, 255, 255, 0.35);
+      margin-top: 6px;
+      text-transform: uppercase;
+    }
+
+    .countdown-colon {
+      font-size: 2rem;
+      font-weight: 800;
+      color: rgba(0, 229, 255, 0.4);
+      margin-bottom: 18px;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.1; }
+    }
+
+    .live-msg {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      color: var(--neon);
+      text-shadow: 0 0 30px rgba(0, 229, 255, 0.8);
+      animation: pulse-glow 1.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse-glow {
+      from { text-shadow: 0 0 20px rgba(0, 229, 255, 0.6); }
+      to   { text-shadow: 0 0 50px rgba(0, 229, 255, 1), 0 0 80px rgba(0, 229, 255, 0.5); }
+    }
+
+    @media (max-width: 600px) {
+      .countdown-block { min-width: 60px; padding: 12px 14px; }
+      .countdown-num { font-size: 2rem; }
+      .countdown-colon { font-size: 1.5rem; }
+    }
+
     /* ── Responsive ── */
     @media (max-width: 600px) {
       nav { padding: 12px 18px; }
@@ -308,6 +391,35 @@
       <li><a href="#mechanics">Mechanics</a></li>
     </ul>
   </nav>
+
+  <!-- Countdown Timer -->
+  <section id="countdown-section">
+    <p class="countdown-label">PRE-ORDER STARTS IN</p>
+    <div id="countdown-live" class="countdown-grid">
+      <div class="countdown-block">
+        <span class="countdown-num" id="cd-days">00</span>
+        <span class="countdown-unit">DAYS</span>
+      </div>
+      <div class="countdown-colon">:</div>
+      <div class="countdown-block">
+        <span class="countdown-num" id="cd-hours">00</span>
+        <span class="countdown-unit">HOURS</span>
+      </div>
+      <div class="countdown-colon">:</div>
+      <div class="countdown-block">
+        <span class="countdown-num" id="cd-mins">00</span>
+        <span class="countdown-unit">MINS</span>
+      </div>
+      <div class="countdown-colon">:</div>
+      <div class="countdown-block">
+        <span class="countdown-num" id="cd-secs">00</span>
+        <span class="countdown-unit">SECS</span>
+      </div>
+    </div>
+    <div id="countdown-live-msg" class="live-msg" style="display:none;">
+      🎮 PRE-ORDER IS NOW LIVE!
+    </div>
+  </section>
 
   <!-- Hero / Top image (down.png = promo poster) -->
   <section id="hero" class="img-section">
@@ -369,6 +481,35 @@
     document.querySelectorAll('.img-wrapper, .divider').forEach(el => {
       observer.observe(el);
     });
+
+    // Countdown to May 29, 2026 00:00:00 Philippine Time (UTC+8)
+    const targetPHT = new Date('2026-05-29T00:00:00+08:00').getTime();
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function updateCountdown() {
+      const now = Date.now();
+      const diff = targetPHT - now;
+
+      if (diff <= 0) {
+        document.getElementById('countdown-live').style.display = 'none';
+        document.getElementById('countdown-live-msg').style.display = 'block';
+        return;
+      }
+
+      const days  = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const mins  = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const secs  = Math.floor((diff % (1000 * 60)) / 1000);
+
+      document.getElementById('cd-days').textContent  = pad(days);
+      document.getElementById('cd-hours').textContent = pad(hours);
+      document.getElementById('cd-mins').textContent  = pad(mins);
+      document.getElementById('cd-secs').textContent  = pad(secs);
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
   </script>
 </body>
 </html>
