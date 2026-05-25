@@ -70,13 +70,14 @@
 
     nav .brand img {
       display: block;
-      mix-blend-mode: screen; /* makes black bg transparent on dark nav */
     }
 
     nav .brand .logo-infinix {
       height: 22px;
       width: auto;
-      filter: brightness(0) invert(1); /* force white */
+      /* invert black text on white bg → white text on black, then drop the black bg via screen */
+      filter: invert(1);
+      mix-blend-mode: screen;
     }
 
     nav .brand .logo-sep {
@@ -89,7 +90,9 @@
     nav .brand .logo-gt50 {
       height: 18px;
       width: auto;
-      filter: brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(160deg); /* white → neon cyan tint */
+      /* gt50_pro.png: white text on black bg — screen blends black away, keeps white; tint cyan */
+      mix-blend-mode: screen;
+      filter: brightness(1.1) sepia(1) saturate(4) hue-rotate(160deg);
       opacity: 0.95;
     }
 
